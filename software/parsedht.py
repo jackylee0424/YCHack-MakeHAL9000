@@ -7,9 +7,14 @@ import json
 import pickle
 
 block_list = []
+machine_name = "old_raspi"
 
 if not os.path.exists("data"):
     os.makedirs("data")
+
+# remove old block
+if os.path.exists(os.path.join('data', "block.blk")):
+    os.remove(os.path.join('data', "block.blk"))
 
 # save it to a block
 if os.path.exists(os.path.join('data', "block.blk")):
@@ -31,11 +36,10 @@ while True:
 		output_dhc22 = dict()
 		output_dhc22["timestamp"] = time.time()
 		output_dhc22["data"] = dict()
-		output_dhc22["data"]["humidity"] = dht22[0]
-		output_dhc22["data"]["temperaturec"] = dht22[1]
-		output_dhc22["data"]["temperaturef"] = dht22[2]
-		output_dhc22["data"]["heatindexf"] = dht22[3]
-		output_dhc22["data"]["host_id"] = "old_raspi"
+		output_dhc22["data"]["%s_humidity"%machine_name] = dht22[0]
+		output_dhc22["data"]["%s_temperaturec"%machine_name] = dht22[1]
+		output_dhc22["data"]["%s_temperaturef"%machine_name] = dht22[2]
+		output_dhc22["data"]["%s_heatindexf"%machine_name] = dht22[3]
 
 		block_list.append(output_dhc22)
 		# create a blank block
