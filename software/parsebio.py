@@ -7,7 +7,7 @@ import json
 import pickle
 import thread
 
-block_list = []
+#block_list = []
 block_dict = dict()
 
 machine_name = "lee_raspi"
@@ -28,17 +28,22 @@ else:
     with open(os.path.join('data', 'block.blk'), 'wb') as f:
         pickle.dump(block_dict, f)
 
-print "block_dict", block_dict
+#print "block_dict", block_dict
+
+if "bio" in block_dict:
+    print "found existing object data"
+else:
+    block_dict["bio"] = []
 
 def posttofirebase():
 	with open(os.path.join('data', 'block.blk'), 'wb') as output:
-		block_dict["bio"] = block_list
+		#block_dict["bio"] = block_list
 		pickle.dump(block_dict, output, pickle.HIGHEST_PROTOCOL)
 		print "save it to file"
 
 		try:
 			# post to firebase
-			response = requests.patch(url, data=json.dumps(dict(bio=block_list)))
+			response = requests.patch(url, data=json.dumps(dict(bio=block_dict["bio"])))
 			print response
 		except:
 			print "posting error"
@@ -69,7 +74,7 @@ if __name__ == "__main__":
 			output_bio["data"]["%s-skfecg"%machine_name] = biosig[4]
 
 			#print output_bio
-			block_list.append(output_bio)
+			block_dict["bio"].append(output_bio)
 
-			if len(block_list) % 301 == 300:
+			if len(block_dict["bio"]) % 301 == 300:
 				thread.start_new_thread(posttofirebase,())
