@@ -85,6 +85,7 @@ def objectrecog():
         for i in stdoutput.strip().split("\n"):
             tmp = (i.split(", ")[-1]).split(" ")
             found_objects.append(dict(obj_name=" ".join(tmp[:-1]), obj_score=float(tmp[-1])))
+        print found_objects
 
 def posttofirebase():
     with open(os.path.join('data', 'block.blk'), 'wb') as output:
@@ -118,7 +119,7 @@ if __name__ == "__main__":
         
         cv2.imshow("camera", img)
 
-        if counter % 120 == 25:
+        if counter % 90 == 25:
             output_objs = dict()
             output_objs["timestamp"] = time.time()
             output_objs["data"] = dict()
@@ -129,4 +130,5 @@ if __name__ == "__main__":
             #print len(block_list)
             thread.start_new_thread(posttofirebase,())
         counter += 1
+        print counter
         key = cv2.waitKey(10)
