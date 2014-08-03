@@ -59,12 +59,16 @@ if __name__ == "__main__":
 	while True:
 	    line = ser.readline()
 	    #print len(line)
-	    print line
+	    #print line
 	    if len(line) > 24 and len(line) < 28:
 			try:
 				biosig = map(lambda x:float(x), line.strip().split(' '))
 			except:
 				continue
+
+			if biosig[4] == 0:
+				continue
+
 			output_bio = dict()
 			output_bio["timestamp"] = t0 + biosig[0] * .001
 			output_bio["data"] = dict()
