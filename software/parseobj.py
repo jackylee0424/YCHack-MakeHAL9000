@@ -6,7 +6,6 @@ import pickle
 import time
 import requests
 import json
-import thread
 
 #block_list = []
 block_dict = dict()
@@ -86,6 +85,7 @@ def objectrecog():
         for i in stdoutput.strip().split("\n"):
             tmp = (i.split(", ")[-1]).split(" ")
             found_objects.append(dict(obj_name=" ".join(tmp[:-1]), obj_score=float(tmp[-1])))
+        print found_objects
 
 def posttofirebase():
     with open(os.path.join('data', 'block.blk'), 'wb') as output:
@@ -112,10 +112,14 @@ if __name__ == "__main__":
         	cv2.imwrite("tmp.jpg", img)
         	thread.start_new_thread(objectrecog,())
         detectFaces(img, cascade)
-        cv2.putText(img, "" if not any(found_objects) else str(found_objects[0]), (20, 400), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 0), thickness=1, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_face) else (found_face[0]), (20, 40), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 0), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else (found_objects[0]["obj_name"]), (20, 80), cv2.FONT_HERSHEY_PLAIN, 2, (255, 55, 100), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else (found_objects[1]["obj_name"]), (20, 120), cv2.FONT_HERSHEY_PLAIN, 2, (255, 100, 55), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else (found_objects[2]["obj_name"]), (20, 160), cv2.FONT_HERSHEY_PLAIN, 2, (55, 255, 100), thickness=2, lineType=cv2.CV_AA)
+        
         cv2.imshow("camera", img)
 
-        if counter % 120 == 25:
+        if counter % 90 == 25:
             output_objs = dict()
             output_objs["timestamp"] = time.time()
             output_objs["data"] = dict()
@@ -126,4 +130,5 @@ if __name__ == "__main__":
             #print len(block_list)
             thread.start_new_thread(posttofirebase,())
         counter += 1
+        print counter
         key = cv2.waitKey(10)

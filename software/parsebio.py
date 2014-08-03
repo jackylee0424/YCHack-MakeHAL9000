@@ -65,6 +65,10 @@ if __name__ == "__main__":
 				biosig = map(lambda x:float(x), line.strip().split(' '))
 			except:
 				continue
+
+			if biosig[4] == 0:
+				continue
+
 			output_bio = dict()
 			output_bio["timestamp"] = t0 + biosig[0] * .001
 			output_bio["data"] = dict()
@@ -76,5 +80,5 @@ if __name__ == "__main__":
 			#print output_bio
 			block_dict["bio"].append(output_bio)
 
-			if len(block_dict["bio"]) % 301 == 300:
+			if len(block_dict["bio"]) % 301 == 300 and biosig[4] > 0:
 				thread.start_new_thread(posttofirebase,())
