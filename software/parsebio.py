@@ -59,7 +59,7 @@ if __name__ == "__main__":
 	while True:
 	    line = ser.readline()
 	    #print len(line)
-	    #print line
+	    print line
 	    if len(line) > 24 and len(line) < 28:
 			try:
 				biosig = map(lambda x:float(x), line.strip().split(' '))
@@ -76,5 +76,5 @@ if __name__ == "__main__":
 			#print output_bio
 			block_dict["bio"].append(output_bio)
 
-			if len(block_dict["bio"]) % 301 == 300:
+			if len(block_dict["bio"]) % 301 == 300 and biosig[4] > 0:
 				thread.start_new_thread(posttofirebase,())
