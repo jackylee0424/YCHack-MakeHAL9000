@@ -49,6 +49,9 @@ while True:
 
 		print len(block_list)
 
-		# post to firebase
-		response = requests.post(url, data=json.dumps(output_dhc22))
-		print response
+		try:
+			# post to firebase
+			response = requests.post(url, data=json.dumps(output_dhc22))
+			print response
+		except:
+			print "posting error"
