@@ -8,7 +8,7 @@ import requests
 import json
 import thread
 
-block_list = []
+#block_list = []
 block_dict = dict()
 url = "https://timeseriesvisual.firebaseio.com/.json"
 
@@ -22,13 +22,20 @@ if not os.path.exists("data"):
 # save it to a block
 if os.path.exists(os.path.join('data', "block.blk")):
     with open(os.path.join('data', 'block.blk'), 'rb') as f:
-        block_list = pickle.load(f)
+        block_dict.update(pickle.load(f))
 else:
     # create a blank block
     with open(os.path.join('data', 'block.blk'), 'wb') as f:
-        pickle.dump(block_list, f)
+        pickle.dump(block_dict, f)
 
-block_list = []
+print "block_dict", block_dict
+
+if "objects" in block_dict:
+    print "found existing object data"
+else:
+    block_dict["objects"] = []
+
+#block_list = []
 machine_name = "lee_air"
 
 biggest_face = None
@@ -66,26 +73,29 @@ def detectFaces(img, cascade):
 
 
 def objectrecog():
-	global found_objects
+    global found_objects
 
-	## super slow 4~5 sec
-	cmd = "~/code/overfeat/bin/macos/overfeat -n 6 tmp.jpg"
-	print "recogizing objects..."
-	process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-	stdoutput = process.stdout.read()
-	if stdoutput:
-		found_objects = stdoutput.strip().split("\n")
-		print found_objects
-
+    ## super slow 4~5 sec
+    cmd = "~/code/overfeat/bin/macos/overfeat -n 6 tmp.jpg"
+    print "recogizing objects..."
+    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    stdoutput = process.stdout.read()
+    if stdoutput:
+        #found_objects = stdoutput.strip().split("\n")
+        #print found_objects
+        for i in stdoutput.strip().split("\n"):
+            tmp = (i.split(", ")[-1]).split(" ")
+            found_objects.append(dict(obj_name=" ".join(tmp[:-1]), obj_score=float(tmp[-1])))
 
 def posttofirebase():
     with open(os.path.join('data', 'block.blk'), 'wb') as output:
-        pickle.dump(block_list, output, pickle.HIGHEST_PROTOCOL)
+        #block_dict["objects"] = block_list
+        pickle.dump(block_dict, output, pickle.HIGHEST_PROTOCOL)
         print "save it to file"
 
         try:
             # post to firebase
-            response = requests.patch(url, data=json.dumps(dict(objects=block_list)))
+            response = requests.patch(url, data=json.dumps(dict(objects=block_dict["objects"])))
             print response
         except:
             print "posting error"
@@ -102,7 +112,7 @@ if __name__ == "__main__":
         	cv2.imwrite("tmp.jpg", img)
         	thread.start_new_thread(objectrecog,())
         detectFaces(img, cascade)
-        cv2.putText(img, "" if not any(found_objects) else found_objects[0], (20, 400), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 0), thickness=1, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else str(found_objects[0]), (20, 400), cv2.FONT_HERSHEY_PLAIN, 1, (255, 255, 0), thickness=1, lineType=cv2.CV_AA)
         cv2.imshow("camera", img)
 
         if counter % 120 == 25:
@@ -112,8 +122,8 @@ if __name__ == "__main__":
             output_objs["data"]["%s-facestring"%machine_name] = found_face
             output_objs["data"]["%s-objstring"%machine_name] = found_objects
 
-            block_list.append(output_objs)
-            print len(block_list)
+            block_dict["objects"].append(output_objs)
+            #print len(block_list)
             thread.start_new_thread(posttofirebase,())
         counter += 1
         key = cv2.waitKey(10)

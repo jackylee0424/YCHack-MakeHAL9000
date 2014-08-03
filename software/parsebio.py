@@ -8,28 +8,32 @@ import pickle
 import thread
 
 block_list = []
+block_dict = dict()
+
 machine_name = "lee_raspi"
 
 if not os.path.exists("data"):
     os.makedirs("data")
 
 # remove old block
-if os.path.exists(os.path.join('data', "block.blk")):
-    os.remove(os.path.join('data', "block.blk"))
+#if os.path.exists(os.path.join('data', "block.blk")):
+#    os.remove(os.path.join('data', "block.blk"))
 
 # save it to a block
 if os.path.exists(os.path.join('data', "block.blk")):
     with open(os.path.join('data', 'block.blk'), 'rb') as f:
-        block_list = pickle.load(f)
+        block_dict.update(pickle.load(f))
 else:
     # create a blank block
     with open(os.path.join('data', 'block.blk'), 'wb') as f:
-        pickle.dump(block_list, f)
+        pickle.dump(block_dict, f)
 
+print "block_dict", block_dict
 
 def posttofirebase():
 	with open(os.path.join('data', 'block.blk'), 'wb') as output:
-		pickle.dump(block_list, output, pickle.HIGHEST_PROTOCOL)
+		block_dict["bio"] = block_list
+		pickle.dump(block_dict, output, pickle.HIGHEST_PROTOCOL)
 		print "save it to file"
 
 		try:
@@ -59,7 +63,6 @@ if __name__ == "__main__":
 			output_bio = dict()
 			output_bio["timestamp"] = t0 + biosig[0] * .001
 			output_bio["data"] = dict()
-			#output_bio["data"]["%s-ms"%machine_name] = biosig[0]
 			output_bio["data"]["%s-temperaturec"%machine_name] = biosig[1]
 			output_bio["data"]["%s-temperaturef"%machine_name] = biosig[2]
 			output_bio["data"]["%s-ltfppg"%machine_name] = biosig[3]
