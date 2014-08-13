@@ -1,17 +1,20 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from firebase import firebase
+import requests
+import json
+
 
 class DataRetriever:
   ts_thresholds = {}
 
   def __init__(self):
-    self.firebaseRef = firebase.FirebaseApplication(
-        'https://timeseriesvisual.firebaseio.com/', None)
+    self.data_url = 'https://timeseriesvisual.firebaseio.com'
 
   def RetrieveRawData(self, data_name='/raw'):
-    raw_data = self.firebaseRef.get(data_name, None)
+    response = requests.get(self.data_url + data_name + '.json')
+    raw_data = json.loads(response.text)
+    
     start_time = self.ts_thresholds.setdefault(data_name, 0)
     raw_data = sorted([(obj['timestamp'], obj['data']) for obj in raw_data
                        if obj['timestamp'] > start_time])

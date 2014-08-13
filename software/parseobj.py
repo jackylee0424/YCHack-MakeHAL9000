@@ -75,7 +75,7 @@ def objectrecog():
     global found_objects
 
     ## super slow 4~5 sec
-    cmd = "~/code/overfeat/bin/macos/overfeat -n 6 tmp.jpg"
+    cmd = "~/code/overfeat/bin/macos/overfeat -n 7 tmp.jpg"
     print "recogizing objects..."
     process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
     stdoutput = process.stdout.read()
@@ -102,24 +102,25 @@ def posttofirebase():
 
 
 if __name__ == "__main__":
+    found_objects = []
     cascade = cv2.CascadeClassifier(os.path.join("xml", "haarcascade_frontalface_alt.xml"))
     cam = cv2.VideoCapture(0)
     counter = 0
 
     while True:
         ret, img = cam.read()
-        if counter % 120 == 1:
+        if counter % 50 == 10:
         	cv2.imwrite("tmp.jpg", img)
         	thread.start_new_thread(objectrecog,())
         detectFaces(img, cascade)
         cv2.putText(img, "" if not any(found_face) else (found_face[0]), (20, 40), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 0), thickness=2, lineType=cv2.CV_AA)
-        cv2.putText(img, "" if not any(found_objects) else (found_objects[0]["obj_name"]), (20, 80), cv2.FONT_HERSHEY_PLAIN, 2, (255, 55, 100), thickness=2, lineType=cv2.CV_AA)
-        cv2.putText(img, "" if not any(found_objects) else (found_objects[1]["obj_name"]), (20, 120), cv2.FONT_HERSHEY_PLAIN, 2, (255, 100, 55), thickness=2, lineType=cv2.CV_AA)
-        cv2.putText(img, "" if not any(found_objects) else (found_objects[2]["obj_name"]), (20, 160), cv2.FONT_HERSHEY_PLAIN, 2, (55, 255, 100), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "likes", (20, 80), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 100), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else (found_objects[0]["obj_name"]), (20, 120), cv2.FONT_HERSHEY_PLAIN, 2, (255, 200, 55), thickness=2, lineType=cv2.CV_AA)
+        cv2.putText(img, "" if not any(found_objects) else (found_objects[1]["obj_name"]), (20, 160), cv2.FONT_HERSHEY_PLAIN, 2, (55, 255, 100), thickness=2, lineType=cv2.CV_AA)
         
         cv2.imshow("camera", img)
 
-        if counter % 90 == 25:
+        if counter % 120 == 25:
             output_objs = dict()
             output_objs["timestamp"] = time.time()
             output_objs["data"] = dict()
