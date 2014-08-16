@@ -13,7 +13,7 @@ url = "https://timeseriesvisual.firebaseio.com/.json"
 # DHT/Raspi setup
 DHT22 = 22
 dev_type = DHT22
-dhtpin = 7
+dhtpin = 8
 
 # block setup
 block_dict = dict()
@@ -59,6 +59,7 @@ def posttofirebase():
 
 
 if __name__ == "__main__":
+	dhtreader.init()
 	while True:
 		time.sleep(2000)
 		try:
