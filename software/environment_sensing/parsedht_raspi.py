@@ -23,8 +23,8 @@ if not os.path.exists("data"):
     os.makedirs("data")
 
 # remove old block
-#if os.path.exists(os.path.join('data', "block.blk")):
-#    os.remove(os.path.join('data', "block.blk"))
+if os.path.exists(os.path.join('data', "block.blk")):
+    os.remove(os.path.join('data', "block.blk"))
 
 # save it to a block
 if os.path.exists(os.path.join('data', "block.blk")):
@@ -61,11 +61,11 @@ def posttofirebase():
 if __name__ == "__main__":
 	dhtreader.init()
 	while True:
-		time.sleep(2)
+		time.sleep(5)
 		try:
 			t, h = dhtreader.read(dev_type, dhtpin)
 		except:
-			print "error"
+			#print "error"
 			continue
 		if t and h:
 			print("Temp = {0} C, Hum = {1} %".format(t, h))
@@ -79,4 +79,4 @@ if __name__ == "__main__":
 
 			#block_list.append(output_dhc22)
 			block_dict["raw"].append(output_dhc22)
-			#thread.start_new_thread(posttofirebase,())
+			thread.start_new_thread(posttofirebase,())
