@@ -61,13 +61,14 @@ def posttofirebase():
 if __name__ == "__main__":
 	dhtreader.init()
 	while True:
-		time.sleep(2000)
+		time.sleep(2)
 		try:
 			t, h = dhtreader.read(dev_type, dhtpin)
 		except:
+			print "error"
 			continue
 		if t and h:
-			print("Temp = {0} *C, Hum = {1} %".format(t, h))
+			print("Temp = {0} C, Hum = {1} %".format(t, h))
 			output_dhc22 = dict()
 			output_dhc22["timestamp"] = time.time()
 			output_dhc22["data"] = dict()
@@ -78,6 +79,4 @@ if __name__ == "__main__":
 
 			#block_list.append(output_dhc22)
 			block_dict["raw"].append(output_dhc22)
-
-			print len(block_list)
 			#thread.start_new_thread(posttofirebase,())
